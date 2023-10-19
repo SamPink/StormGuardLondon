@@ -1,5 +1,5 @@
 {
-	"name": "londonweather",
+	"name": "londonweatherrest",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "weatherapiservice",
