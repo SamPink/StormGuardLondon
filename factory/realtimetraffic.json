@@ -1,0 +1,9 @@
+{
+	"name": "realtimetraffic",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5be3cbd1-8902-46fc-8eb0-444419f445e1",
+		"tenantId": "6050c6b1-eee9-435b-8d46-4f3c7eb8cce2"
+	}
+}
