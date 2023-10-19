@@ -1,0 +1,136 @@
+{
+	"name": "Json1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "londonweather"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"location": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"region": {
+							"type": "string"
+						},
+						"country": {
+							"type": "string"
+						},
+						"lat": {
+							"type": "number"
+						},
+						"lon": {
+							"type": "number"
+						},
+						"tz_id": {
+							"type": "string"
+						},
+						"localtime_epoch": {
+							"type": "integer"
+						},
+						"localtime": {
+							"type": "string"
+						}
+					}
+				},
+				"current": {
+					"type": "object",
+					"properties": {
+						"last_updated_epoch": {
+							"type": "integer"
+						},
+						"last_updated": {
+							"type": "string"
+						},
+						"temp_c": {
+							"type": "integer"
+						},
+						"temp_f": {
+							"type": "number"
+						},
+						"is_day": {
+							"type": "integer"
+						},
+						"condition": {
+							"type": "object",
+							"properties": {
+								"text": {
+									"type": "string"
+								},
+								"icon": {
+									"type": "string"
+								},
+								"code": {
+									"type": "integer"
+								}
+							}
+						},
+						"wind_mph": {
+							"type": "number"
+						},
+						"wind_kph": {
+							"type": "number"
+						},
+						"wind_degree": {
+							"type": "integer"
+						},
+						"wind_dir": {
+							"type": "string"
+						},
+						"pressure_mb": {
+							"type": "integer"
+						},
+						"pressure_in": {
+							"type": "integer"
+						},
+						"precip_mm": {
+							"type": "integer"
+						},
+						"precip_in": {
+							"type": "integer"
+						},
+						"humidity": {
+							"type": "integer"
+						},
+						"cloud": {
+							"type": "integer"
+						},
+						"feelslike_c": {
+							"type": "integer"
+						},
+						"feelslike_f": {
+							"type": "number"
+						},
+						"vis_km": {
+							"type": "integer"
+						},
+						"vis_miles": {
+							"type": "integer"
+						},
+						"uv": {
+							"type": "integer"
+						},
+						"gust_mph": {
+							"type": "number"
+						},
+						"gust_kph": {
+							"type": "number"
+						}
+					}
+				}
+			}
+		}
+	}
+}
