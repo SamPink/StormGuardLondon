@@ -9,7 +9,13 @@
 		"type": "Json",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation"
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@utcnow()",
+					"type": "Expression"
+				},
+				"folderPath": "london",
+				"fileSystem": "weather"
 			}
 		},
 		"schema": {
