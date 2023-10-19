@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "/current.json?q=London&key=b65dec440d144aa690c173641231910"
+				"relativeUrl": "current.json?q=London&key=b65dec440d144aa690c173641231910"
 			}
 		},
 		"schema": {
