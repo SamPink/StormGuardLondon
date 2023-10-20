@@ -10,6 +10,11 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@formatDateTime()",
+					"type": "Expression"
+				},
+				"folderPath": "weather",
 				"fileSystem": "londonweather"
 			}
 		},
