@@ -10,7 +10,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "status",
+				"fileName": {
+					"value": "@formatDateTime(pipeline().TriggerTime, 'dd-MMM-yyyy hh:mm:ss')",
+					"type": "Expression"
+				},
 				"folderPath": "tfl",
 				"fileSystem": "londonweather"
 			}
