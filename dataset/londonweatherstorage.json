@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@formatDateTime()",
+					"value": "@formatDateTime(pipeline().TriggerTime, 'dd-MMM-yyyy hh:mm:ss')",
 					"type": "Expression"
 				},
 				"folderPath": "weather",
