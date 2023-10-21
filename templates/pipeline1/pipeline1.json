@@ -1,0 +1,659 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name"
+		},
+		"AzureDatabricks1": {
+			"type": "string"
+		},
+		"weatherapiservice": {
+			"type": "string"
+		},
+		"AzureDataLakeStorage1": {
+			"type": "string"
+		},
+		"tflservice": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "londonweatherrest",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "londonweatherstorage",
+								"type": "DatasetReference"
+							}
+						]
+					},
+					{
+						"name": "Copy data2",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Copy data1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "tflrest",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "tflstorage",
+								"type": "DatasetReference"
+							}
+						]
+					},
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy data2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/samuel.pink@outlook.com/weather+tfl"
+						},
+						"linkedServiceName": {
+							"referenceName": "[parameters('AzureDatabricks1')]",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/londonweatherrest')]",
+				"[concat(variables('factoryId'), '/datasets/londonweatherstorage')]",
+				"[concat(variables('factoryId'), '/datasets/tflrest')]",
+				"[concat(variables('factoryId'), '/datasets/tflstorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/londonweatherrest')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('weatherapiservice')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "current.json?q=London&key=b65dec440d144aa690c173641231910"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"location": {
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"region": {
+									"type": "string"
+								},
+								"country": {
+									"type": "string"
+								},
+								"lat": {
+									"type": "number"
+								},
+								"lon": {
+									"type": "number"
+								},
+								"tz_id": {
+									"type": "string"
+								},
+								"localtime_epoch": {
+									"type": "integer"
+								},
+								"localtime": {
+									"type": "string"
+								}
+							}
+						},
+						"current": {
+							"type": "object",
+							"properties": {
+								"last_updated_epoch": {
+									"type": "integer"
+								},
+								"last_updated": {
+									"type": "string"
+								},
+								"temp_c": {
+									"type": "integer"
+								},
+								"temp_f": {
+									"type": "number"
+								},
+								"is_day": {
+									"type": "integer"
+								},
+								"condition": {
+									"type": "object",
+									"properties": {
+										"text": {
+											"type": "string"
+										},
+										"icon": {
+											"type": "string"
+										},
+										"code": {
+											"type": "integer"
+										}
+									}
+								},
+								"wind_mph": {
+									"type": "number"
+								},
+								"wind_kph": {
+									"type": "number"
+								},
+								"wind_degree": {
+									"type": "integer"
+								},
+								"wind_dir": {
+									"type": "string"
+								},
+								"pressure_mb": {
+									"type": "integer"
+								},
+								"pressure_in": {
+									"type": "integer"
+								},
+								"precip_mm": {
+									"type": "integer"
+								},
+								"precip_in": {
+									"type": "integer"
+								},
+								"humidity": {
+									"type": "integer"
+								},
+								"cloud": {
+									"type": "integer"
+								},
+								"feelslike_c": {
+									"type": "integer"
+								},
+								"feelslike_f": {
+									"type": "number"
+								},
+								"vis_km": {
+									"type": "integer"
+								},
+								"vis_miles": {
+									"type": "integer"
+								},
+								"uv": {
+									"type": "integer"
+								},
+								"gust_mph": {
+									"type": "number"
+								},
+								"gust_kph": {
+									"type": "number"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/londonweatherstorage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureDataLakeStorage1')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{formatDateTime(utcNow(), 'yyyy-MM-dd-HH-mm')}_weather.json",
+							"type": "Expression"
+						},
+						"folderPath": "weather_bronze",
+						"fileSystem": "londonweather"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"location": {
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"region": {
+									"type": "string"
+								},
+								"country": {
+									"type": "string"
+								},
+								"lat": {
+									"type": "number"
+								},
+								"lon": {
+									"type": "number"
+								},
+								"tz_id": {
+									"type": "string"
+								},
+								"localtime_epoch": {
+									"type": "integer"
+								},
+								"localtime": {
+									"type": "string"
+								}
+							}
+						},
+						"current": {
+							"type": "object",
+							"properties": {
+								"last_updated_epoch": {
+									"type": "integer"
+								},
+								"last_updated": {
+									"type": "string"
+								},
+								"temp_c": {
+									"type": "integer"
+								},
+								"temp_f": {
+									"type": "number"
+								},
+								"is_day": {
+									"type": "integer"
+								},
+								"condition": {
+									"type": "object",
+									"properties": {
+										"text": {
+											"type": "string"
+										},
+										"icon": {
+											"type": "string"
+										},
+										"code": {
+											"type": "integer"
+										}
+									}
+								},
+								"wind_mph": {
+									"type": "number"
+								},
+								"wind_kph": {
+									"type": "number"
+								},
+								"wind_degree": {
+									"type": "integer"
+								},
+								"wind_dir": {
+									"type": "string"
+								},
+								"pressure_mb": {
+									"type": "integer"
+								},
+								"pressure_in": {
+									"type": "integer"
+								},
+								"precip_mm": {
+									"type": "integer"
+								},
+								"precip_in": {
+									"type": "integer"
+								},
+								"humidity": {
+									"type": "integer"
+								},
+								"cloud": {
+									"type": "integer"
+								},
+								"feelslike_c": {
+									"type": "integer"
+								},
+								"feelslike_f": {
+									"type": "number"
+								},
+								"vis_km": {
+									"type": "integer"
+								},
+								"vis_miles": {
+									"type": "integer"
+								},
+								"uv": {
+									"type": "integer"
+								},
+								"gust_mph": {
+									"type": "number"
+								},
+								"gust_kph": {
+									"type": "number"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tflrest')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('tflservice')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "Line/Mode/tube,overground,dlr/Status?app_key=bc40e1e08cc54af4ac37b65a17acff80"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"$type": {
+							"type": "string"
+						},
+						"id": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"modeName": {
+							"type": "string"
+						},
+						"disruptions": {
+							"type": "array"
+						},
+						"created": {
+							"type": "string"
+						},
+						"modified": {
+							"type": "string"
+						},
+						"lineStatuses": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"$type": {
+										"type": "string"
+									},
+									"id": {
+										"type": "integer"
+									},
+									"statusSeverity": {
+										"type": "integer"
+									},
+									"statusSeverityDescription": {
+										"type": "string"
+									},
+									"created": {
+										"type": "string"
+									},
+									"validityPeriods": {
+										"type": "array"
+									}
+								}
+							}
+						},
+						"routeSections": {
+							"type": "array"
+						},
+						"serviceTypes": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"$type": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"uri": {
+										"type": "string"
+									}
+								}
+							}
+						},
+						"crowding": {
+							"type": "object",
+							"properties": {
+								"$type": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tflstorage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureDataLakeStorage1')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{formatDateTime(utcNow(), 'yyyy-MM-dd-HH-mm')}_tfl.json",
+							"type": "Expression"
+						},
+						"folderPath": "tfl_bronze",
+						"fileSystem": "londonweather"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"$type": {
+							"type": "string"
+						},
+						"id": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"modeName": {
+							"type": "string"
+						},
+						"disruptions": {
+							"type": "array"
+						},
+						"created": {
+							"type": "string"
+						},
+						"modified": {
+							"type": "string"
+						},
+						"lineStatuses": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"$type": {
+										"type": "string"
+									},
+									"id": {
+										"type": "integer"
+									},
+									"statusSeverity": {
+										"type": "integer"
+									},
+									"statusSeverityDescription": {
+										"type": "string"
+									},
+									"created": {
+										"type": "string"
+									},
+									"validityPeriods": {
+										"type": "array"
+									}
+								}
+							}
+						},
+						"routeSections": {
+							"type": "array"
+						},
+						"serviceTypes": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"$type": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"uri": {
+										"type": "string"
+									}
+								}
+							}
+						},
+						"crowding": {
+							"type": "object",
+							"properties": {
+								"$type": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
