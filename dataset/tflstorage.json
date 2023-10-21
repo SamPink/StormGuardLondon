@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@formatDateTime(pipeline().TriggerTime, 'dd-MMM-yyyy hh:mm:ss')",
+					"value": "@{formatDateTime(utcNow(), 'yyyy-MM-dd-HH-mm')}/file.json",
 					"type": "Expression"
 				},
 				"folderPath": "tfl_bronze",
