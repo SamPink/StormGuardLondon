@@ -1,5 +1,5 @@
 {
-	"name": "5mins",
+	"name": "3mins",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
@@ -15,7 +15,7 @@
 		"typeProperties": {
 			"recurrence": {
 				"frequency": "Minute",
-				"interval": 5,
+				"interval": 3,
 				"startTime": "2023-10-21T14:31:00",
 				"timeZone": "GMT Standard Time"
 			}
