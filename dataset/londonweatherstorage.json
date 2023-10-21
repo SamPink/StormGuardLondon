@@ -14,7 +14,7 @@
 					"value": "@formatDateTime(pipeline().TriggerTime, 'dd-MMM-yyyy hh:mm:ss')",
 					"type": "Expression"
 				},
-				"folderPath": "weather",
+				"folderPath": "weather_bronse",
 				"fileSystem": "londonweather"
 			}
 		},
