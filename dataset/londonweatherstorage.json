@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@{formatDateTime(utcNow(), 'yyyy-MM-dd-HH-mm')}/file.json",
+					"value": "@{formatDateTime(utcNow(), 'yyyy-MM-dd-HH-mm')}_weather.json",
 					"type": "Expression"
 				},
 				"folderPath": "weather_bronze",
